@@ -4,13 +4,27 @@ import {
   Text3D,
   useMatcapTexture,
 } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
 import { Perf } from "r3f-perf";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export default function Experience() {
   const [torusGeometry, setTorusGeometry] = useState();
-  const [material, setMaterial] = useState();
-  const [matCapTexture] = useMatcapTexture("36220C_C6C391_8C844A_8B7B4C", 256);
+  const [Textmaterial, setTextMaterial] = useState();
+  const [Donutmaterial, setDonutMaterial] = useState();
+
+  // 36220C_C6C391_8C844A_8B7B4C
+  // 515151_DCDCDC_B7B7B7_9B9B9B
+  const [matCapTexture1] = useMatcapTexture("6D1616_E6CDBA_DE2B24_230F0F", 256);
+  const [matCapTexture2] = useMatcapTexture("660505_F2B090_DD4D37_AA1914", 256);
+
+  const donutsGroup = useRef();
+
+  useFrame((state, delta) => {
+    for (const donut of donutsGroup.current.children) {
+      donut.rotation.y += delta * 0.2;
+    }
+  });
 
   return (
     <>
@@ -19,11 +33,12 @@ export default function Experience() {
       <OrbitControls makeDefault />
 
       <torusGeometry ref={setTorusGeometry} args={[1, 0.6, 16, 32]} />
-      <meshMatcapMaterial ref={setMaterial} matcap={matCapTexture} />
+      <meshMatcapMaterial ref={setTextMaterial} matcap={matCapTexture1} />
+      <meshMatcapMaterial ref={setDonutMaterial} matcap={matCapTexture2} />
 
       <Center>
         <Text3D
-          material={material}
+          material={Textmaterial}
           font={"./fonts/helvetiker_regular.typeface.json"}
           size={0.75}
           height={0.2}
@@ -34,25 +49,26 @@ export default function Experience() {
           bevelOffset={0}
           bevelSegments={5}
         >
-          Hello R3F
+          Abhay Suresh Dandge
           {/* <meshMatcapMaterial matcap={matCapTexture} /> */}
         </Text3D>
       </Center>
-
-      {[...Array(100)].map((value, index) => (
-        <mesh
-          geometry={torusGeometry}
-          material={material}
-          key={index}
-          position={[
-            (Math.random() - 0.5) * 10,
-            (Math.random() - 0.5) * 10,
-            (Math.random() - 0.5) * 10,
-          ]}
-          scale={0.2 + Math.random() * 0.2}
-          rotation={[Math.random() * Math.PI, Math.random() * Math.PI, 0]}
-        />
-      ))}
+      <group ref={donutsGroup}>
+        {[...Array(200)].map((value, index) => (
+          <mesh
+            geometry={torusGeometry}
+            material={Donutmaterial}
+            key={index}
+            position={[
+              (Math.random() - 0.5) * 15,
+              (Math.random() - 0.5) * 15,
+              (Math.random() - 0.5) * 15,
+            ]}
+            scale={0.2 + Math.random() * 0.2}
+            rotation={[Math.random() * Math.PI, Math.random() * Math.PI, 0]}
+          />
+        ))}
+      </group>
     </>
   );
 }
